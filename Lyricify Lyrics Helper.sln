@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lyricify.Lyrics.Helper", "L
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lyricify.Lyrics.Demo", "Lyricify.Lyrics.Demo\Lyricify.Lyrics.Demo.csproj", "{BE7F184B-5228-4669-A4FB-2BA3B20C1744}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lyricify.Lyrics.Api", "Lyricify.Lyrics.Api\Lyricify.Lyrics.Api.csproj", "{B548BBFE-DC31-4B82-9A86-4FB41B245724}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{BE7F184B-5228-4669-A4FB-2BA3B20C1744}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BE7F184B-5228-4669-A4FB-2BA3B20C1744}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BE7F184B-5228-4669-A4FB-2BA3B20C1744}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B548BBFE-DC31-4B82-9A86-4FB41B245724}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B548BBFE-DC31-4B82-9A86-4FB41B245724}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B548BBFE-DC31-4B82-9A86-4FB41B245724}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B548BBFE-DC31-4B82-9A86-4FB41B245724}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
