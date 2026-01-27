@@ -5,6 +5,7 @@
 
 # Visual Studio Code directory
 .vscode/
+.idea/
 
 # Mac-specific hidden file
 .DS_Store
