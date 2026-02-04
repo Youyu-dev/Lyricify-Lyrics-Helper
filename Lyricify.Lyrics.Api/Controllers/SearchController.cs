@@ -62,7 +62,8 @@ namespace Lyricify.Lyrics.Api.Controllers
 
         [HttpGet("search/{provider}")]
         [ProducesResponseType(typeof(List<SearchResultDto>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<SearchResultDto>>> Search(string provider, string title, string? artist = null, string? album = null)
+        public async Task<ActionResult<List<SearchResultDto>>> Search(string provider, string title,
+            string? artist = null, string? album = null)
         {
             Searchers.Searchers searcherType;
             try
@@ -116,54 +117,66 @@ namespace Lyricify.Lyrics.Api.Controllers
                         if (qqLyrics != null)
                         {
                             lyricsResult = qqLyrics;
-                            // QQ Music returns decrypted QRC usually
-                            rawLyricsToParse = qqLyrics.Lyrics; 
-                            rawType = LyricsRawTypes.Qrc; 
-                            // If it's pure LRC, we might need detection, but QRC is standard for this method
+                            rawLyricsToParse = qqLyrics.Lyrics;
+                            rawType = LyricsRawTypes.Qrc;
                         }
+
                         break;
                     case "netease":
                         var neteaseApi = Lyricify.Lyrics.Providers.Web.Providers.NeteaseApi;
-                        var neteaseLyrics = await neteaseApi.GetLyric(id);
+                        // 尝试获取逐字歌词
+                        var neteaseLyrics = await neteaseApi.GetLyricNew(id);
                         if (neteaseLyrics != null)
                         {
                             lyricsResult = neteaseLyrics;
-                            // Prefer YRC if available, then QRC/KRC (rarely), then LRC
-                            if (neteaseLyrics.Yrc?.Lyric != null) { rawLyricsToParse = neteaseLyrics.Yrc.Lyric; rawType = LyricsRawTypes.Yrc; }
-                            else if (neteaseLyrics.Lrc?.Lyric != null) { rawLyricsToParse = neteaseLyrics.Lrc.Lyric; rawType = LyricsRawTypes.Lrc; }
+                            if (neteaseLyrics.Yrc?.Lyric != null)
+                            {
+                                rawLyricsToParse = neteaseLyrics.Yrc.Lyric;
+                                rawType = LyricsRawTypes.Yrc;
+                            }
+                            else if (neteaseLyrics.Qfy &&
+                                     neteaseLyrics.Yrc == null) // 如果没有 YRC 但标记有逐字，可能需要其他方式？暂时回退检查其他字段
+                            {
+                                // 也许在 Klyric 中？
+                                if (neteaseLyrics.Klyric?.Lyric != null)
+                                {
+                                    rawLyricsToParse = neteaseLyrics.Klyric.Lyric;
+                                    rawType = LyricsRawTypes.Krc;
+                                }
+                                // 实在没有，回退到 LRC
+                                else if (neteaseLyrics.Lrc?.Lyric != null)
+                                {
+                                    rawLyricsToParse = neteaseLyrics.Lrc.Lyric;
+                                    rawType = LyricsRawTypes.Lrc;
+                                }
+                            }
+                            else if (neteaseLyrics.Lrc?.Lyric != null)
+                            {
+                                // 没有逐字，回退 LRC
+                                rawLyricsToParse = neteaseLyrics.Lrc.Lyric;
+                                rawType = LyricsRawTypes.Lrc;
+                            }
                         }
                         break;
                     case "kugou":
                         var kugouApi = Lyricify.Lyrics.Providers.Web.Providers.KugouApi;
-                        // Kugou usually needs hash and access key, but let's see if we can use the search result ID.
-                        // KugouSearchResult uses FileHash as Id. 
-                        // However, Api.GetSearchLyrics needs duration too ideally, but let's try just hash?
-                        // Actually GetSearchLyrics searches by keyword... 
-                        // Let's check KugouSearcher implementation.
-                        // KugouSearcher.SearchForResults calls Api.GetSearchSong.
-                        // We need a method to get lyrics by Hash.
-                        // Api.GetSearchLyrics takes keywords, duration, hash.
                         var kugouResp = await kugouApi.GetSearchLyrics(hash: id);
-                         if (kugouResp != null)
+                        if (kugouResp != null)
                         {
                             lyricsResult = kugouResp;
-                            // We need to download the actual lyrics content, GetSearchLyrics only returns candidates info.
-                            // The candidates have 'id' and 'accesskey'. We need another API call to 'download' lyrics.
-                            // But looking at Kugou/Api.cs, there isn't a DownloadLyrics method exposed directly?
-                            // This might be a limitation of the current Helper. 
-                            // Wait, let's return the Candidate for now if parsing is not possible without more calls.
                         }
+
                         break;
                     case "musixmatch":
                         var mxApi = Lyricify.Lyrics.Providers.Web.Providers.MusixmatchApi;
-                        // Musixmatch GetFullLyricsRaw takes trackId.
                         var mxLyrics = await mxApi.GetFullLyricsRaw(id);
-                         if (mxLyrics != null)
+                        if (mxLyrics != null)
                         {
                             lyricsResult = mxLyrics;
                             rawLyricsToParse = mxLyrics;
                             rawType = LyricsRawTypes.Musixmatch;
                         }
+
                         break;
                     case "sodamusic":
                         var sodaApi = Lyricify.Lyrics.Providers.Web.Providers.SodaMusicApi;
@@ -177,9 +190,11 @@ namespace Lyricify.Lyrics.Api.Controllers
                                 Enum.TryParse(sodaDetail.Lyric.Type, true, out rawType);
                             }
                         }
+
                         break;
                     default:
-                        return BadRequest("Invalid provider. Supported providers: netease, qq, kugou, musixmatch, sodamusic");
+                        return BadRequest(
+                            "Invalid provider. Supported providers: netease, qq, kugou, musixmatch, sodamusic");
                 }
 
                 if (lyricsResult == null) return NotFound();
