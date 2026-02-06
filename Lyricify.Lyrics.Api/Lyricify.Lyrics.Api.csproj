@@ -4,7 +4,34 @@
         <TargetFramework>net6.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        
+        <!-- 自包含发布体积优化配置 -->
+        <!-- 启用程序集裁剪，移除未使用的代码 -->
+        <PublishTrimmed>true</PublishTrimmed>
+        
+        <!-- 使用单文件发布，将所有文件打包成单个可执行文件 -->
+        <PublishSingleFile>true</PublishSingleFile>
+        
+        <!-- 启用就绪运行（ReadyToRun），提升启动速度 -->
+        <PublishReadyToRun>true</PublishReadyToRun>
+        
+        <!-- 不包含 PDB 调试符号文件，减小体积 -->
+        <DebugType>none</DebugType>
+        <DebugSymbols>false</DebugSymbols>
+        
+        <!-- 启用单文件压缩 -->
+        <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+        
+        <!-- 包含原生库在单文件中 -->
+        <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+        
+        <!-- 优化体积而非速度 -->
+        <OptimizationPreference>Size</OptimizationPreference>
     </PropertyGroup>
+
+    <ItemGroup>
+      <TrimmerRootDescriptor Include="DynamicDependency.xml" />
+    </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\Lyricify.Lyrics.Helper\Lyricify.Lyrics.Helper.csproj" />

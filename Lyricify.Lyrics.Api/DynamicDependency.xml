@@ -1,0 +1,14 @@
+<linker>
+  <!-- 保留 Newtonsoft.Json 避免裁剪导致的序列化问题 -->
+  <assembly fullname="Newtonsoft.Json">
+    <type fullname="*" />
+  </assembly>
+  
+  <!-- 保留 Swashbuckle 相关程序集 -->
+  <assembly fullname="Swashbuckle.AspNetCore.SwaggerGen">
+    <type fullname="*" />
+  </assembly>
+  <assembly fullname="Swashbuckle.AspNetCore.SwaggerUI">
+    <type fullname="*" />
+  </assembly>
+</linker>
