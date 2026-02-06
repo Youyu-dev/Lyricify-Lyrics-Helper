@@ -28,15 +28,14 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// 在所有环境中启用 Swagger（包括生产环境）
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseCors("AllowAll"); // 启用 CORS
 
-app.UseHttpsRedirection();
+// 不使用 HTTPS 重定向，仅支持 HTTP
+// app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
